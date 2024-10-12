@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyberpunk Countdown & Task Calendar</title>
+    <style>
+        /* Cyberpunk-Inspired Styling */
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #0d0d0d;
+            color: #00ffcc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        h1, h2, p {
+            color: #00ffcc;
+            text-shadow: 0px 0px 10px #00ffcc;
+        }
+
+        button {
+            padding: 15px 30px;
+            border: none;
+            background-color: #00ffcc;
+            color: #0d0d0d;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 5px;
+            text-shadow: 0px 0px 5px #0d0d0d;
+        }
+
+        button:hover {
+            background-color: #008866;
+        }
+
+        .calendar-container {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #1a1a1a;
+            border-radius: 10px;
+            max-width: 800px;
+            box-shadow: 0px 0px 10px #00ffcc;
+        }
+
+        .month {
+            margin: 20px 0;
+            font-size: 1.5rem;
+            text-align: center;
+            text-shadow: 0px 0px 5px #00ffcc;
+        }
+
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+        }
+
+        .calendar div {
+            padding: 20px;
+            background-color: #0d0d0d;
+            color: #00ffcc;
+            text-align: center;
+            border: 1px solid #00ffcc;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .calendar div:hover {
+            background-color: #1a1a1a;
+        }
+
+        .task-button {
+            display: inline-block;
+            margin-top: 10px;
+            background-color: #00ffcc;
+            color: #0d0d0d;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        /* Timer Styling */
+        #timer {
+            font-size: 1.5rem;
+            text-align: center;
+            margin-bottom: 30px;
+            color: #00ffcc;
+            text-shadow: 0px 0px 5px #00ffcc;
+        }
+
+        /* Modal Styling */
+        #taskModal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #1a1a1a;
+            color: #00ffcc;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px #00ffcc;
+            z-index: 100;
+        }
+
+        #taskModal h2 {
+            margin-bottom: 10px;
+        }
+
+        #taskModal textarea {
+            width: 100%;
+            height: 100px;
+            background-color: #0d0d0d;
+            color: #00ffcc;
+            border: 1px solid #00ffcc;
+            padding: 10px;
+        }
+
+        #taskModal button {
+            padding: 10px 20px;
+            background-color: #00ffcc;
+            color: #0d0d0d;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        #closeModal {
+            background-color: #ff0066;
+        }
+    </style>
+</head>
+<body>
+    <h1>DON'T GIVE UP....</h1>
+    <h2>SLOW SUCCESS BUILDS CHARACTER.... FAST SUCCESS BUILDS EGO</h2>
+    <h3>Days Left Until 2025</h3>
+    <div id="timer"></div>
+
+    <button onclick="showCalendar()">Open Calendar</button>
+
+    <!-- Calendar Container -->
+    <div class="calendar-container" id="calendarContainer"></div>
+
+    <!-- Task Modal -->
+    <div id="taskModal">
+        <h2 id="modalDate"></h2>
+        <textarea id="taskInput" placeholder="Enter your tasks here..."></textarea>
+        <button onclick="saveTask()">Save Task</button>
+        <button id="closeModal" onclick="closeModal()">Close</button>
+    </div>
+
+    <script>
+        // Countdown Timer with Days, Hours, Minutes, and Seconds
+        function countdown() {
+            const targetDate = new Date("January 1, 2025").getTime();
+
+            const updateTimer = () => {
+                const now = new Date().getTime();
+                const timeLeft = targetDate - now;
+
+                const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+                document.getElementById("timer").innerHTML = `${days} Days : ${hours} Hrs : ${minutes} Min : ${seconds} Sec`;
+
+                // Update every second
+                setTimeout(updateTimer, 1000);
+            };
+
+            updateTimer();
+        }
+
+        countdown(); // Start the countdown timer
+
+        // Function to show calendar starting from October 12, 2024
+        function showCalendar() {
+            const calendarContainer = document.getElementById("calendarContainer");
+            calendarContainer.innerHTML = ''; // Clear the container
+
+            const today = new Date();
+            let startMonth = today.getMonth();
+            let startDay = today.getDate();
+
+            if (startDay < 12) {
+                startDay = 12; // Start from October 12, 2024
+            }
+
+            const currentYear = today.getFullYear();
+
+            // Loop through the remaining months starting from October
+            for (let month = startMonth; month < 12; month++) {
+                const monthDiv = document.createElement("div");
+                monthDiv.classList.add("month");
+                const monthName = new Date(currentYear, month).toLocaleString("default", { month: "long" });
+                monthDiv.textContent = monthName + " " + currentYear;
+
+                const calendarDiv = document.createElement("div");
+                calendarDiv.classList.add("calendar");
+
+                const daysInMonth = new Date(currentYear, month + 1, 0).getDate();
+                for (let day = (month === startMonth ? startDay : 1); day <= daysInMonth; day++) {
+                    const dayDiv = document.createElement("div");
+                    dayDiv.textContent = day;
+                    dayDiv.onclick = function () {
+                        openModal(`${currentYear}-${month + 1}-${day}`);
+                    };
+
+                    const taskButton = document.createElement("button");
+                    taskButton.classList.add("task-button");
+                    taskButton.textContent = "Add Task";
+                    dayDiv.appendChild(taskButton);
+
+                    calendarDiv.appendChild(dayDiv);
+                }
+
+                calendarContainer.appendChild(monthDiv);
+                calendarContainer.appendChild(calendarDiv);
+            }
+
+            calendarContainer.style.display = "block"; // Show the calendar
+        }
+
+        // Task Modal Functions
+        function openModal(date) {
+            const modal = document.getElementById("taskModal");
+            const modalDate = document.getElementById("modalDate");
+            modalDate.textContent = "Tasks for " + date;
+            const taskInput = document.getElementById("taskInput");
+
+            // Retrieve tasks from localStorage
+            const savedTask = localStorage.getItem(date);
+            taskInput.value = savedTask || "";
+
+            modal.style.display = "block";
+        }
+
+        function closeModal() {
+            document.getElementById("taskModal").style.display = "none";
+        }
+
+        function saveTask() {
+            const modalDate = document.getElementById("modalDate").textContent.replace("Tasks for ", "");
+            const taskInput = document.getElementById("taskInput").value;
+
+            // Save task to localStorage
+            localStorage.setItem(modalDate, taskInput);
+
+            closeModal();
+        }
+    </script>
+</body>
+</html>
